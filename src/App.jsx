@@ -9,6 +9,7 @@ import PaymentPendingPage from "./PaymentPendingPage";
 import PaymentSuccessPage from "./PaymentSuccessPage";
 import GroupStatusPage from "./GroupStatusPage";
 import RestaurantDashboard from "./RestaurantDashboard";
+import RestaurantTablesPage from "./RestaurantTablesPage";
 
 function App() {
   return (
@@ -22,6 +23,8 @@ function App() {
       <Route path="/payment-success" element={<PaymentSuccessPage />} />
       <Route path="/group-status" element={<GroupStatusPage />} />
        <Route path="/manager-dashboard" element={<RestaurantDashboard />} />
+       <Route path="/manager/tables" element={<RestaurantTablesPage />} />
+       <Route path="/manager-dashboard/:tableId" element={<RestaurantDashboard />} />
     </Routes>
   );
 }

@@ -1,18 +1,28 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 function RestaurantDashboard() {
   const navigate = useNavigate();
+  const { tableId } = useParams(); // 👈 get table number from URL
 
   return (
     <div className="page">
       <div className="card group-card">
 
         {/* HEADER */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 30 }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 30,
+          }}
+        >
           <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
             <div className="qr-icon">🏬</div>
             <div>
-              <h2 style={{ color: "#fff", margin: 0 }}>Restaurant Dashboard</h2>
+              <h2 style={{ color: "#fff", margin: 0 }}>
+                Restaurant Dashboard
+              </h2>
               <p className="subtitle" style={{ margin: "4px 0 0" }}>
                 Table Management View
               </p>
@@ -34,8 +44,19 @@ function RestaurantDashboard() {
         </div>
 
         {/* SUMMARY CARDS */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 20, marginBottom: 32 }}>
-          <SummaryBox title="Table" value="T-14" icon="🍽️" />
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(4, 1fr)",
+            gap: 20,
+            marginBottom: 32,
+          }}
+        >
+          <SummaryBox
+            title="Table"
+            value={tableId || "N/A"}   // 👈 dynamic table
+            icon="🍽️"
+          />
           <SummaryBox title="Total Bill" value="₹900" icon="💰" />
           <SummaryBox title="Collected" value="₹225" icon="✅" green />
           <SummaryBox title="Pending" value="₹675" icon="❌" red />
@@ -43,7 +64,9 @@ function RestaurantDashboard() {
 
         {/* PAYMENTS TABLE */}
         <div className="bill-box">
-          <h3 style={{ color: "#fff", marginBottom: 16 }}>Customer Payments</h3>
+          <h3 style={{ color: "#fff", marginBottom: 16 }}>
+            Customer Payments
+          </h3>
 
           <div className="row" style={{ fontWeight: 600 }}>
             <span>User ID</span>
@@ -53,21 +76,43 @@ function RestaurantDashboard() {
             <span>Status</span>
           </div>
 
-          <PaymentRow id="U01" name="Rahul" phone="98XXXX1234" amount="₹225" status="Unpaid" />
-          <PaymentRow id="U02" name="Priya" phone="98XXXX5678" amount="₹225" status="Unpaid" />
-          <PaymentRow id="U03" name="Amit" phone="98XXXX4321" amount="₹225" status="Unpaid" />
-          <PaymentRow id="U26" name="Jhih,hj" phone="87XXXX7965" amount="₹225" status="Paid" />
+          <PaymentRow
+            id="U01"
+            name="Rahul"
+            phone="98XXXX1234"
+            amount="₹225"
+            status="Unpaid"
+          />
+          <PaymentRow
+            id="U02"
+            name="Priya"
+            phone="98XXXX5678"
+            amount="₹225"
+            status="Unpaid"
+          />
+          <PaymentRow
+            id="U03"
+            name="Amit"
+            phone="98XXXX4321"
+            amount="₹225"
+            status="Unpaid"
+          />
+          <PaymentRow
+            id="U26"
+            name="Jhih,hj"
+            phone="87XXXX7965"
+            amount="₹225"
+            status="Paid"
+          />
         </div>
 
-        {/* ACTION BUTTONS */}
-        <div style={{
-              background: "linear-gradient(180deg, #ff4d4d, #e63b3b)",
-              color: "#fff",
-              fontWeight: 800,
-            }}
+        {/* ACTION BUTTON */}
+        <div>
+          <button
+            className="secondary"
+            onClick={() => navigate("/manager/tables")}
           >
-          <button className="secondary" onClick={() => navigate("/")}>
-            🚫 Close Bill
+            ← Back to Tables
           </button>
         </div>
       </div>
@@ -111,7 +156,9 @@ function PaymentRow({ id, name, phone, amount, status }) {
           padding: "4px 12px",
           borderRadius: 20,
           fontSize: 13,
-          background: paid ? "rgba(0,200,100,0.15)" : "rgba(255,80,80,0.15)",
+          background: paid
+            ? "rgba(0,200,100,0.15)"
+            : "rgba(255,80,80,0.15)",
           color: paid ? "#3cff9a" : "#ff6b6b",
           fontWeight: 600,
         }}

@@ -383,3 +383,206 @@ button.secondary {
     flex-direction: column;
   }
 }
+
+
+
+/* ===== LOGIN TWO BIG CARDS ===== */
+.login-layout {
+  display: flex;
+  gap: 40px;
+  align-items: stretch;
+}
+
+/* Make both boxes bigger */
+.login-layout .card {
+  width: 620px;          /* BIGGER WIDTH */
+  min-height: 540px;     /* BIGGER HEIGHT */
+  padding: 56px;         /* More breathing space */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Align both buttons in same horizontal line */
+.login-layout .card button {
+  margin-top: auto;
+}
+
+
+/* ===== GLOBAL BACKGROUND ANIMATION ===== */
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  inset: -20%;
+  z-index: -1;
+  background: radial-gradient(
+    circle,
+    rgba(255, 176, 32, 0.12),
+    transparent 60%
+  );
+  animation: floatBg 22s linear infinite;
+}
+
+/* second layer for depth */
+body::after {
+  animation-duration: 30s;
+  animation-direction: reverse;
+  opacity: 0.6;
+}
+
+@keyframes floatBg {
+  0% {
+    transform: translate(-10%, -10%) rotate(0deg);
+  }
+  50% {
+    transform: translate(10%, 10%) rotate(180deg);
+  }
+  100% {
+    transform: translate(-10%, -10%) rotate(360deg);
+  }
+}
+
+
+/* --- LAYOUT FIXES --- */
+.login-layout {
+  display: flex !important;
+  gap: 40px;
+  align-items: stretch !important; /* Forces both cards to have identical height */
+  justify-content: center;
+  max-width: 1200px;
+}
+
+.card {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important; /* Pushes button to bottom */
+  flex: 1; /* Makes cards equal width */
+  min-height: 580px; /* Adjust based on your preference */
+}
+
+.card-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  /* This centers the manager content vertically to look less empty */
+  justify-content: center; 
+}
+
+/* --- ICON INSIDE INPUT FIX --- */
+.input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.input-wrapper .icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  font-size: 18px;
+  pointer-events: none;
+}
+
+.form-group input, 
+.form-group select {
+  padding-left: 48px !important; /* Makes room for the icon */
+  width: 100%;
+}
+
+/* --- MANAGER SPECIFIC TWEAKS --- */
+.manager-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 20px;
+  background: rgba(240, 179, 71, 0.1);
+  border: 1px solid rgba(240, 179, 71, 0.2);
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+}
+
+/* Ensure subtitles match exactly */
+.subtitle {
+  color: #9aa6c4 !important;
+  margin: 12px auto 32px auto !important;
+  max-width: 300px;
+  line-height: 1.5;
+}
+
+/* Fix button glow to look more premium */
+button {
+  margin-top: 30px !important; /* Ensures space above button */
+  box-shadow: 0 10px 30px rgba(240, 146, 0, 0.2) !important;
+}
+
+button:hover {
+  box-shadow: 0 15px 40px rgba(240, 146, 0, 0.4) !important;
+}
+
+
+
+
+
+/* --- TOP HEADER ADJUSTMENTS --- */
+
+.page {
+  flex-direction: column; /* Stacks Brand Header above Login Layout */
+  justify-content: flex-start; /* Allows top padding to control height */
+  padding-top: 80px;
+}
+
+.brand-header {
+  margin-bottom: 50px; /* Space between logo and cards */
+  text-align: center;
+}
+
+/* Make the SplitPay logo larger since it's now the main header */
+.brand-header .qr-title {
+  font-size: 48px !important;
+  letter-spacing: -1.5px;
+}
+
+/* --- CARD TITLE ADJUSTMENTS --- */
+
+/* Title inside the card (User Login / Manager Access) */
+.form-title, .manager-title {
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+/* Center all headings inside the card-content */
+.card-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* Ensure consistent spacing for the second card icon */
+.manager-icon {
+  margin-bottom: 15px !important;
+}
+
+
+
+/* --- USER ICON STYLING --- */
+.user-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 15px auto; /* Centers the icon and adds bottom spacing */
+  background: rgba(240, 179, 71, 0.1); /* Subtle orange glow background */
+  border: 1px solid rgba(240, 179, 71, 0.2);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+}
+
+
+
