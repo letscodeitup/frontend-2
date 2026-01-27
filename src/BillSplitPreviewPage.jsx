@@ -11,7 +11,7 @@ function BillSplitPreviewPage() {
   } = state || {};
 
   return (
-    <div className="page">
+    <div className="page orange-page">
       <div className="card">
 
         <div className="qr-icon">💰</div>

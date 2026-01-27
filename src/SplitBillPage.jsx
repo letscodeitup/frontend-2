@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+
 function SplitBillPage() {
   const navigate = useNavigate();
 
@@ -10,24 +11,17 @@ function SplitBillPage() {
 
   const handleConfirm = () => {
     navigate("/preview", {
-      state: {
-        totalBill,
-        people,
-        perPerson,
-      },
+      state: { totalBill, people, perPerson },
     });
   };
 
   return (
-    <div className="page">
+    <div className="page orange-page">
       <div className="card split-card">
-
         <div className="qr-icon">👥</div>
 
         <h2 className="qr-title">How Many People?</h2>
-        <p className="subtitle">
-          Select the number of people splitting the bill
-        </p>
+        <p className="subtitle">Select the number of people splitting the bill</p>
 
         <select
           className="dropdown"
@@ -51,23 +45,21 @@ function SplitBillPage() {
             <span>{people} people</span>
           </div>
 
+          <div className="divider"></div>
+
           <div className="row bold">
             <span>Your Share</span>
             <span>₹{perPerson}</span>
           </div>
         </div>
 
-        <p className="info">
-          Bill will be split equally among all users
-        </p>
+        <p className="info">Bill will be split equally among all users</p>
 
-        <button className="confirm" onClick={handleConfirm}>
-          Confirm Split
-        </button>
-
+        <button onClick={handleConfirm}>Confirm Split</button>
       </div>
     </div>
   );
 }
 
 export default SplitBillPage;
+

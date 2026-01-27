@@ -9,7 +9,7 @@ function ConfirmPaymentPage() {
   const userId = state?.userId || "U29";
 
   return (
-    <div className="page">
+    <div className="page orange-page">
       <div className="card">
 
         <div className="qr-icon">💳</div>

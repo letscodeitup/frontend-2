@@ -39,7 +39,7 @@ function GroupStatusPage() {
   const pendingAmount = totalAmount - collectedAmount;
 
   return (
-    <div className="page">
+    <div className="page orange-page">
       <div className="card group-card">
 
         <div className="qr-icon">👥</div>

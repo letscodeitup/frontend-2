@@ -8,7 +8,7 @@ function PaymentSuccessPage() {
   const userId = state?.userId || "U49";
 
   return (
-    <div className="page">
+    <div className="page orange-page">
       <div className="card">
 
         <div className="qr-icon">✅</div>

@@ -1,107 +1,122 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "./api"; // adjust if needed
 
-function ScanQRPage() {
-  const videoRef = useRef(null);
-  const streamRef = useRef(null);
+export default function ScanQRPage() {
   const navigate = useNavigate();
 
-  const [cameraOn, setCameraOn] = useState(false);
-  const [scanning, setScanning] = useState(false);
-  const [error, setError] = useState("");
+  const [groupCode, setGroupCode] = useState("");
+  const [totalBill, setTotalBill] = useState("");
+  const [people, setPeople] = useState(2);
+  const [loading, setLoading] = useState(false);
 
-  const goNext = () => {
-    setTimeout(() => {
-      navigate("/next-page"); // 🔁 SAME PAGE FOR BOTH
-    }, 3500);
+  const perPerson =
+    totalBill && people ? Math.round(Number(totalBill) / people) : 0;
+
+  const handleGenerate = async () => {
+    if (!groupCode || groupCode.length < 3) {
+      alert("Enter a valid group code");
+      return;
+    }
+
+    if (!totalBill || Number(totalBill) <= 0) {
+      alert("Enter a valid bill amount");
+      return;
+    }
+
+    if (people < 2) {
+      alert("At least 2 people are required");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const res = await api.post("/bill/create", {
+        groupCode,
+        totalAmount: Number(totalBill),
+        numberOfUsers: people,
+      });
+
+      const { billId, splitAmount, qr } = res.data;
+
+      const payload = {
+        billId,
+        groupCode,
+        splitAmount,
+        totalBill: Number(totalBill),
+        people,
+        qr,
+      };
+
+      // ✅ backup so refresh won't break
+      localStorage.setItem("billPreview", JSON.stringify(payload));
+
+      navigate("/preview", { state: payload });
+    } catch (err) {
+      console.error(err);
+      alert("Failed to create bill. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
-
-  const startCamera = () => {
-    setCameraOn(true);
-    setScanning(true);
-    goNext();
-  };
-
-  const demoScan = () => {
-    setScanning(true);
-    goNext();
-  };
-
-  useEffect(() => {
-    if (!cameraOn) return;
-
-    const initCamera = async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: "environment" },
-          audio: false,
-        });
-
-        streamRef.current = stream;
-
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          await videoRef.current.play();
-        }
-      } catch (err) {
-        setError("Unable to access camera.");
-        setCameraOn(false);
-      }
-    };
-
-    initCamera();
-
-    return () => {
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach(track => track.stop());
-      }
-    };
-  }, [cameraOn]);
 
   return (
     <div className="page">
-      <div className="card qr-card">
+      <div className="card split-card">
+        <div className="qr-icon">👥</div>
 
-        <div className="qr-icon">⌁</div>
+        <h2 className="qr-title">Scan & Create Bill</h2>
+        <p className="subtitle">Enter details to generate QR</p>
 
-        <h2 className="qr-title">Scan Table QR</h2>
-        <p className="subtitle">
-          Scan the QR code on your table to get started
-        </p>
+        <input
+          className="input"
+          placeholder="Enter group code (e.g. trip-goa)"
+          value={groupCode}
+          onChange={(e) => setGroupCode(e.target.value)}
+        />
 
-        <div className="qr-box">
-          {cameraOn ? (
-            <video
-              ref={videoRef}
-              className="camera-video"
-              playsInline
-              muted
-            />
-          ) : (
-            <div className="camera-icon">📷</div>
-          )}
+        <input
+          className="input"
+          type="number"
+          placeholder="Enter total bill amount"
+          value={totalBill}
+          onChange={(e) => setTotalBill(e.target.value)}
+        />
 
-          {/* 🔥 SCAN LINE */}
-          {scanning && <div className="scan-line" />}
+        <select
+          className="dropdown"
+          value={people}
+          onChange={(e) => setPeople(Number(e.target.value))}
+        >
+          <option value={2}>2 people</option>
+          <option value={3}>3 people</option>
+          <option value={4}>4 people</option>
+          <option value={5}>5 people</option>
+          <option value={6}>6 people</option>
+        </select>
+
+        <div className="bill-box">
+          <div className="row">
+            <span>Total Bill</span>
+            <span>₹{totalBill || 0}</span>
+          </div>
+
+          <div className="row">
+            <span>Split Between</span>
+            <span>{people} people</span>
+          </div>
+
+          <div className="row bold">
+            <span>Per Person</span>
+            <span>₹{perPerson}</span>
+          </div>
         </div>
 
-        {error && <div className="error-box">{error}</div>}
-
-        {!cameraOn && !scanning && (
-          <button onClick={startCamera}>
-            Start Camera Scan
-          </button>
-        )}
-
-        {!scanning && (
-          <button className="secondary" onClick={demoScan}>
-            Demo: Simulate Scan
-          </button>
-        )}
-
+        <button className="confirm" onClick={handleGenerate} disabled={loading}>
+          {loading ? "Creating Bill..." : "Generate QR"}
+        </button>
       </div>
     </div>
   );
 }
-
-export default ScanQRPage;
