@@ -1,65 +1,94 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "./api"; // adjust if needed
 
-
-function SplitBillPage() {
+export default function ScanQRPage() {
   const navigate = useNavigate();
 
-  const totalBill = 900;
-  const [people, setPeople] = useState(4);
-  const perPerson = Math.round(totalBill / people);
+  const [groupCode, setGroupCode] = useState("");
+  const [totalBill, setTotalBill] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleConfirm = () => {
-    navigate("/preview", {
-      state: { totalBill, people, perPerson },
-    });
+  const handleGenerate = async () => {
+    if (!groupCode || groupCode.trim().length < 3) {
+      alert("Enter a valid group code");
+      return;
+    }
+
+    if (!totalBill || Number(totalBill) <= 0) {
+      alert("Enter a valid bill amount");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const res = await api.post("/bill/create", {
+        groupCode: groupCode.trim(),
+        totalAmount: Number(totalBill),
+      });
+
+      const data = res?.data?.data ?? res?.data;
+      const { billId, qr } = data || {};
+
+      if (!billId) {
+        throw new Error("billId missing from API response");
+      }
+
+      const payload = {
+        billId,
+        groupCode: groupCode.trim(),
+        totalBill: Number(totalBill),
+        qr,
+      };
+
+      // backup for refresh
+      localStorage.setItem("billPreview", JSON.stringify(payload));
+
+      // go to preview / QR page
+      navigate("/scan", { state: payload });
+    } catch (err) {
+      console.error(err);
+      alert(err?.message || "Failed to create bill. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="page orange-page">
+    <div className="page scanbill-page">
       <div className="card split-card">
         <div className="qr-icon">👥</div>
 
-        <h2 className="qr-title">How Many People?</h2>
-        <p className="subtitle">Select the number of people splitting the bill</p>
+        <h2 className="qr-title">Scan & Create Bill</h2>
+        <p className="subtitle">Enter details to generate QR</p>
 
-        <select
-          className="dropdown"
-          value={people}
-          onChange={(e) => setPeople(Number(e.target.value))}
-        >
-          <option value={2}>2 people</option>
-          <option value={3}>3 people</option>
-          <option value={4}>4 people</option>
-          <option value={5}>5 people</option>
-        </select>
+        <input
+          className="input"
+          placeholder="Enter group code (e.g. trip-goa)"
+          value={groupCode}
+          onChange={(e) => setGroupCode(e.target.value)}
+        />
+
+        <input
+          className="input"
+          type="number"
+          placeholder="Enter total bill amount"
+          value={totalBill}
+          onChange={(e) => setTotalBill(e.target.value)}
+        />
 
         <div className="bill-box">
-          <div className="row">
-            <span>Total Bill</span>
-            <span>₹{totalBill}</span>
-          </div>
-
-          <div className="row">
-            <span>Split Between</span>
-            <span>{people} people</span>
-          </div>
-
-          <div className="divider"></div>
-
           <div className="row bold">
-            <span>Your Share</span>
-            <span>₹{perPerson}</span>
+            <span>Total Bill</span>
+            <span>₹{totalBill || 0}</span>
           </div>
         </div>
 
-        <p className="info">Bill will be split equally among all users</p>
-
-        <button onClick={handleConfirm}>Confirm Split</button>
+        <button className="confirm" onClick={handleGenerate} disabled={loading}>
+          {loading ? "Creating Bill..." : "Generate QR"}
+        </button>
       </div>
     </div>
   );
 }
-
-export default SplitBillPage;
-

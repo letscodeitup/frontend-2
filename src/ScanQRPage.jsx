@@ -1,121 +1,120 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "./api"; // adjust if needed
+import api from "./api";
 
 export default function ScanQRPage() {
   const navigate = useNavigate();
 
-  const [groupCode, setGroupCode] = useState("");
-  const [totalBill, setTotalBill] = useState("");
-  const [people, setPeople] = useState(2);
-  const [loading, setLoading] = useState(false);
+  // ---- scan states ----
+  const videoRef = useRef(null);
+  const streamRef = useRef(null);
+  const [cameraOn, setCameraOn] = useState(false);
+  const [scanning, setScanning] = useState(false);
+  const [error, setError] = useState("");
 
-  const perPerson =
-    totalBill && people ? Math.round(Number(totalBill) / people) : 0;
-
-  const handleGenerate = async () => {
-    if (!groupCode || groupCode.length < 3) {
-      alert("Enter a valid group code");
-      return;
-    }
-
-    if (!totalBill || Number(totalBill) <= 0) {
-      alert("Enter a valid bill amount");
-      return;
-    }
-
-    if (people < 2) {
-      alert("At least 2 people are required");
-      return;
-    }
-
+  // ---------------- SCAN FLOW ----------------
+  const handleScanResult = async (tableCode) => {
     try {
-      setLoading(true);
+      const res = await api.get(`/bill/${tableCode}`);
+      const data = res.data;
 
-      const res = await api.post("/bill/create", {
-        groupCode,
-        totalAmount: Number(totalBill),
-        numberOfUsers: people,
+      navigate("/preview", {
+        state: {
+          tableNo: tableCode,
+          totalBill: data.total,
+          splitAmount: data.splitAmount,
+          people: data.participants,
+        },
       });
-
-      const { billId, splitAmount, qr } = res.data;
-
-      const payload = {
-        billId,
-        groupCode,
-        splitAmount,
-        totalBill: Number(totalBill),
-        people,
-        qr,
-      };
-
-      // ✅ backup so refresh won't break
-      localStorage.setItem("billPreview", JSON.stringify(payload));
-
-      navigate("/preview", { state: payload });
     } catch (err) {
-      console.error(err);
-      alert("Failed to create bill. Please try again.");
-    } finally {
-      setLoading(false);
+      setError("Invalid or expired QR");
+      setScanning(false);
     }
   };
 
+  // demo scan
+  const demoScan = () => {
+    setError("");
+    setScanning(true);
+
+    const demoTableCode = "TABLE-12";
+    setTimeout(() => {
+      handleScanResult(demoTableCode);
+    }, 2000);
+  };
+
+  const startCamera = () => {
+    setError("");
+    setCameraOn(true);
+    setScanning(true);
+
+    // simulate for now (remove this when real QR scanning is added)
+    demoScan();
+  };
+
+  useEffect(() => {
+    if (!cameraOn) return;
+
+    const initCamera = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "environment" },
+          audio: false,
+        });
+
+        streamRef.current = stream;
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          await videoRef.current.play();
+        }
+      } catch {
+        setError("Unable to access camera");
+        setCameraOn(false);
+        setScanning(false);
+      }
+    };
+
+    initCamera();
+
+    return () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((t) => t.stop());
+      }
+    };
+  }, [cameraOn]);
+
+  // ---------------- UI ----------------
   return (
     <div className="page">
       <div className="card split-card">
-        <div className="qr-icon">👥</div>
+        <div className="qr-icon">📷</div>
 
-        <h2 className="qr-title">Scan & Create Bill</h2>
-        <p className="subtitle">Enter details to generate QR</p>
+        <h2 className="qr-title">Scan Table QR</h2>
+        <p className="subtitle">Scan the QR to join and split the bill</p>
 
-        <input
-          className="input"
-          placeholder="Enter group code (e.g. trip-goa)"
-          value={groupCode}
-          onChange={(e) => setGroupCode(e.target.value)}
-        />
-
-        <input
-          className="input"
-          type="number"
-          placeholder="Enter total bill amount"
-          value={totalBill}
-          onChange={(e) => setTotalBill(e.target.value)}
-        />
-
-        <select
-          className="dropdown"
-          value={people}
-          onChange={(e) => setPeople(Number(e.target.value))}
-        >
-          <option value={2}>2 people</option>
-          <option value={3}>3 people</option>
-          <option value={4}>4 people</option>
-          <option value={5}>5 people</option>
-          <option value={6}>6 people</option>
-        </select>
-
-        <div className="bill-box">
-          <div className="row">
-            <span>Total Bill</span>
-            <span>₹{totalBill || 0}</span>
-          </div>
-
-          <div className="row">
-            <span>Split Between</span>
-            <span>{people} people</span>
-          </div>
-
-          <div className="row bold">
-            <span>Per Person</span>
-            <span>₹{perPerson}</span>
-          </div>
+        {/* ---- SCAN QR ---- */}
+        <div className="qr-box">
+          {cameraOn ? (
+            <video ref={videoRef} className="camera-video" muted playsInline />
+          ) : (
+            <div className="camera-icon">📷</div>
+          )}
+          {scanning && <div className="scan-line" />}
         </div>
 
-        <button className="confirm" onClick={handleGenerate} disabled={loading}>
-          {loading ? "Creating Bill..." : "Generate QR"}
-        </button>
+        {error && <div className="error-box">{error}</div>}
+
+        {!cameraOn && (
+          <button className="confirm" onClick={startCamera}>
+            Scan Table QR
+          </button>
+        )}
+
+        {!scanning && (
+          <button className="secondary" onClick={demoScan}>
+            Demo: Simulate Scan
+          </button>
+        )}
       </div>
     </div>
   );

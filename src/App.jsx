@@ -3,6 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import CitySelectPage from "./CitySelectPage";
 import CityRestaurantsPage from "./CityRestaurantsPage";
 import LoginPage from "./LoginPage";
+import SplitBillPage from "./SplitBillPage"
 import ScanQRPage from "./ScanQRPage";
 import BillSplitPreviewPage from "./BillSplitPreviewPage";
 import ConfirmPaymentPage from "./ConfirmPaymentPage";
@@ -12,6 +13,7 @@ import GroupStatusPage from "./GroupStatusPage";
 import RestaurantDashboard from "./RestaurantDashboard";
 import RestaurantTablesPage from "./RestaurantTablesPage";
 
+
 function App() {
   return (
     <Routes>
@@ -19,6 +21,7 @@ function App() {
       <Route path="/" element={<CitySelectPage />} />
       <Route path="/city/:cityName" element={<CityRestaurantsPage />} />
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/splitbill" element={<SplitBillPage />} />
 
       {/* BILL FLOW */}
       <Route path="/scan" element={<ScanQRPage />} />

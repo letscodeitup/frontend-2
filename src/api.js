@@ -51,3 +51,8 @@ export async function login(phone) {
 export async function getRestaurantData() {
   return request("/restaurants", { method: "GET" });
 }
+
+export default {
+  login,
+  getRestaurantData,
+};

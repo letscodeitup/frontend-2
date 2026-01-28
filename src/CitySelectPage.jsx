@@ -45,11 +45,15 @@ export default function CitySelectPage() {
     };
   }, []);
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return cities;
-    return cities.filter((name) => name.toLowerCase().includes(q));
-  }, [cities, query]);
+ const filtered = useMemo(() => {
+  const q = query.trim().toLowerCase();
+  if (!q) return cities;
+
+  return cities.filter((c) =>
+    c.city.toLowerCase().includes(q)
+  );
+}, [cities, query]);
+
 
   return (
     <div className="page city-page">
@@ -86,26 +90,24 @@ export default function CitySelectPage() {
             <h3 className="city-section-title">Popular Cities</h3>
 
             <div className="city-grid-orange">
-              {filtered.map((name) => {
-                const slug = slugifyCity(name);
-                return (
-                  <button
-                    key={name}
-                    type="button"
-                    className="city-tile"
-                    onClick={() => navigate(`/city/${encodeURIComponent(slug)}`)}
-                  >
-                    <div className="city-tile-icon">
-                      {CITY_EMOJI[slug] || "🏙️"}
-                    </div>
-                    <div className="city-tile-name">{name}</div>
+   {filtered.map((c) => (
+    <button
+      key={c.city_slug}
+      type="button"
+      className="city-tile"
+      onClick={() =>
+        navigate(`/city/${encodeURIComponent(c.city_slug)}`)
+      }
+    >
+      <div className="city-tile-icon">
+        {CITY_EMOJI[c.city_slug] || "🏙️"}
+      </div>
 
-                    {/* ✅ removed restaurant count line */}
-                    {/* <div className="city-tile-sub">...</div> */}
-                  </button>
-                );
-              })}
-            </div>
+      <div className="city-tile-name">{c.city}</div>
+    </button>
+  ))}
+</div>
+
 
             <div className="city-stats">
               <div>
