@@ -62,7 +62,7 @@ function LoginPage() {
             </div>
           </div>
 
-          <button onClick={() => navigate("/scan")}>Continue</button>
+          <button onClick={() => navigate("/splitbill")}>Continue</button>
         </div>
 
         {/* MANAGER ACCESS CARD */}

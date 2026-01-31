@@ -1,6 +1,6 @@
 // src/api.js
 
-const BASE_URL = "https://YOUR-GITLAB-BACKEND-URL";
+const BASE_URL = "https://localhost:3000";
 
 /**
  * Small helper so every request has same error handling
