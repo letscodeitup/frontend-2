@@ -11,14 +11,10 @@ const CITY_EMOJI = {
   hyderabad: "🏰",
 };
 
-function slugifyCity(name = "") {
-  return name.trim().toLowerCase().replace(/\s+/g, "-");
-}
-
 export default function CitySelectPage() {
   const navigate = useNavigate();
-  const [query, setQuery] = useState("");
 
+  const [query, setQuery] = useState("");
   const [cities, setCities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
@@ -30,11 +26,12 @@ export default function CitySelectPage() {
       try {
         setLoading(true);
         setErr("");
+
         const data = await getCities();
-        // backend gives cities as strings: ["Delhi", "Mumbai", ...]
-        if (alive) setCities(data.cities || []);
+        // Expecting: { cities: [{ city: "Delhi", city_slug: "delhi" }, ...] }
+        if (alive) setCities(data?.cities || []);
       } catch (e) {
-        if (alive) setErr(e.message || "Failed to load cities");
+        if (alive) setErr(e?.message || "Failed to load cities");
       } finally {
         if (alive) setLoading(false);
       }
@@ -45,25 +42,21 @@ export default function CitySelectPage() {
     };
   }, []);
 
- const filtered = useMemo(() => {
-  const q = query.trim().toLowerCase();
-  if (!q) return cities;
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return cities;
 
-  return cities.filter((c) =>
-    c.city.toLowerCase().includes(q)
-  );
-}, [cities, query]);
-
+    // each city object: { city, city_slug }
+    return cities.filter((c) => (c?.city || "").toLowerCase().includes(q));
+  }, [cities, query]);
 
   return (
     <div className="page city-page">
+      {/* ✅ NO SplitPay here (AppLayout already shows it globally) */}
       <div className="card city-card-shell">
-        <div className="city-top">
-          <h1 className="city-brand">
-            Split<span>Pay</span>
-          </h1>
-          <p className="city-muted">Select your city</p>
-        </div>
+        <p className="app-tagline" style={{ marginTop: 0 }}>
+          Select your city
+        </p>
 
         <div className="city-search">
           <span className="city-search-ic">🔎</span>
@@ -90,24 +83,22 @@ export default function CitySelectPage() {
             <h3 className="city-section-title">Popular Cities</h3>
 
             <div className="city-grid-orange">
-   {filtered.map((c) => (
-    <button
-      key={c.city_slug}
-      type="button"
-      className="city-tile"
-      onClick={() =>
-        navigate(`/city/${encodeURIComponent(c.city_slug)}`)
-      }
-    >
-      <div className="city-tile-icon">
-        {CITY_EMOJI[c.city_slug] || "🏙️"}
-      </div>
-
-      <div className="city-tile-name">{c.city}</div>
-    </button>
-  ))}
-</div>
-
+              {filtered.map((c) => (
+                <button
+                  key={c.city_slug}
+                  type="button"
+                  className="city-tile"
+                  onClick={() =>
+                    navigate(`/city/${encodeURIComponent(c.city_slug)}`)
+                  }
+                >
+                  <div className="city-tile-icon">
+                    {CITY_EMOJI[c.city_slug] || "🏙️"}
+                  </div>
+                  <div className="city-tile-name">{c.city}</div>
+                </button>
+              ))}
+            </div>
 
             <div className="city-stats">
               <div>

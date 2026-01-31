@@ -1314,3 +1314,22 @@ button.secondary {
     font-size: 24px;
   }
 }
+
+
+.app-brand-outside {
+  width: 980px;
+  max-width: 95vw;
+  margin: 22px auto 10px;
+  text-align: center;
+}
+
+.app-brand {
+  margin: 0;
+  font-size: 44px;
+  font-weight: 900;
+  color: #111;
+}
+
+.app-brand span {
+  color: #ff7a00;
+}
